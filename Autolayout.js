@@ -123,8 +123,8 @@ while ( auto_layout_file.eof == false ) {
 	else if( layout_file_line_lc.startsWith("pages:") ) {
 	   if( layout.length != gutters.length )
 	   {
-	   	alert( "Problem parsing flow file. Number of layouts does not equal number of gutters" );
-	   	exit();
+            alert( "Problem parsing flow file. Number of layouts does not equal number of gutters" );
+            exit();
 	   }
 	   
 		var pages_line = layout_file_line.split(":")[1];
