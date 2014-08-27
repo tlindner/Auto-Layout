@@ -9,4 +9,4 @@ It is copyright tim lindner, 2014. All rights reserved.
 Autolayout.js is the main script.
 Autolayout_exec.js is a wrapper script that will turn off undo support and screen updates in Indesign. This will reduce execution time.
 
-https://github.com/tlindner/Auto-Layout
+https://github.com/tlindner/Auto-Layout/wiki

@@ -2,7 +2,7 @@
 //
 // Auto Layout by tim lindner (tlindner@macmess.org)
 //
-// https://github.com/tlindner/Auto-Layout
+// https://github.com/tlindner/Auto-Layout/wiki
 //
 
 if (!Array.prototype.indexOf) {
@@ -115,6 +115,14 @@ while ( auto_layout_file.eof == false ) {
         var layout_line = layout_file_line_lc.split(":")[1];
         var arguments = layout_line.split(",").map(Number);
         layout.push([0,1,arguments[1],0,arguments[0]]);
+    }
+    if( layout_file_line_lc.startsWith("bottom to top:") ) {
+        alert( "Bottom to top is unimplemented");
+        exit();
+    }
+    else if( layout_file_line_lc.startsWith("right to left:") ) {
+        alert( "Right to left is unimplemented");
+        exit();
     }
     else if( layout_file_line_lc.startsWith("gutters:") ) {
         var gutter_line = layout_file_line_lc.split(":")[1];
