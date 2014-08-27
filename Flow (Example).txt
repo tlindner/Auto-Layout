@@ -27,6 +27,8 @@ One sided
 #
 # Each page will be stepped and repeated.
 #
+# https://github.com/tlindner/Auto%20Layout
+#
 Top to bottom:3,0
 Left to right:3,0
 Gutters:0.25,0.25

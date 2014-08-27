@@ -1,3 +1,6 @@
+// Part of Auto Layout
+// https://github.com/tlindner/Auto%20Layout
+
 var myParameters = [];
 
 var myScript = app.activeScript;

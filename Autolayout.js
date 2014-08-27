@@ -1,4 +1,11 @@
-if (!Array.prototype.indexOf) { 
+//
+//
+// Auto Layout by tim lindner (tlindner@macmess.org)
+//
+// https://github.com/tlindner/Auto%20Layout
+//
+
+if (!Array.prototype.indexOf) {
 	Array.prototype.indexOf = function (elem, fromIndex){  
 		 fromIndex = fromIndex || 0;  
 		 for(var i = fromIndex; i < this.length; i++){  
