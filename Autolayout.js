@@ -75,26 +75,45 @@ var newPageFlag = false;
 
 myPage.marginPreferences.properties = { top: 0, left: 0, right: 0, bottom:0 };
      
-var layout_file_line;
+var layout_file_line, layout_file_line_lc;
+
+layout_file_line = auto_layout_file.readln().toLowerCase();
+
+if( layout_file_line.startsWith("one sided") ) {
+    // Good to go
+}
+else if( layout_file_line.startsWith("sheetwise")) {
+    alert( "Flow file must being with 'one sided'");
+    exit();
+}
+else {
+    alert( "Flow file must being with 'one sided'");
+    exit();
+}
 
 while ( auto_layout_file.eof == false ) {
 	layout_file_line = auto_layout_file.readln();
-
-	if( layout_file_line.startsWith("#" ) ) {
+    layout_file_line_lc = layout_file_line.toLowerCase();
+    
+	if( layout_file_line_lc.startsWith("#" ) ) {
 		continue;
 	}
 	
-	if( layout_file_line.startsWith("t2b_l2r:") ) {
-		var layout_line = layout_file_line.split(":")[1];
-		var arguments = layout_line.split(",");
-		layout.push([1,0,parseFloat(arguments[2]),0,parseInt(arguments[0])]);
-		layout.push([0,1,parseFloat(arguments[2]),0,parseInt(arguments[1])]);
+	if( layout_file_line_lc.startsWith("top to bottom:") ) {
+		var layout_line = layout_file_line_lc.split(":")[1];
+		var arguments = layout_line.split(",").map(Number);
+		layout.push([1,0,arguments[1],0,arguments[0]]);
 	}
-	else if( layout_file_line.startsWith("Gutters:") ) {
-		var gutter_line = layout_file_line.split(":")[1];
+	else if( layout_file_line_lc.startsWith("left to right:") ) {
+		var layout_line = layout_file_line_lc.split(":")[1];
+		var arguments = layout_line.split(",").map(Number);
+		layout.push([0,1,arguments[1],0,arguments[0]]);
+	}
+	else if( layout_file_line_lc.startsWith("gutters:") ) {
+		var gutter_line = layout_file_line_lc.split(":")[1];
 		gutters.push( gutter_line.split(",").map(Number) );
 	}
-	else if( layout_file_line.startsWith("Pages:") ) {
+	else if( layout_file_line_lc.startsWith("pages:") ) {
 	   if( layout.length != gutters.length )
 	   {
 	   	alert( "Problem parsing flow file. Number of layouts does not equal number of gutters" );
