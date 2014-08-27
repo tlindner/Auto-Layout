@@ -1,5 +1,5 @@
 // Part of Auto Layout
-// https://github.com/tlindner/Auto%20Layout
+// https://github.com/tlindner/Auto-Layout
 
 var myParameters = [];
 

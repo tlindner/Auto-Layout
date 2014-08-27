@@ -2,7 +2,7 @@
 //
 // Auto Layout by tim lindner (tlindner@macmess.org)
 //
-// https://github.com/tlindner/Auto%20Layout
+// https://github.com/tlindner/Auto-Layout
 //
 
 if (!Array.prototype.indexOf) {
