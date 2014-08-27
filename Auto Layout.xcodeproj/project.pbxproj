@@ -6,10 +6,21 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXFileReference section */
+		77C0D91419AE27D600C8CA5C /* Autolayout_exec.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Autolayout_exec.js; sourceTree = "<group>"; };
+		77C0D91519AE27D600C8CA5C /* Autolayout.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Autolayout.js; sourceTree = "<group>"; };
+		77C0D91619AE27F200C8CA5C /* README */ = {isa = PBXFileReference; lastKnownFileType = text; path = README; sourceTree = "<group>"; };
+		77C0D91719AE288200C8CA5C /* Flow (Example).txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Flow (Example).txt"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		77C0D90D19AE278C00C8CA5C = {
 			isa = PBXGroup;
 			children = (
+				77C0D91419AE27D600C8CA5C /* Autolayout_exec.js */,
+				77C0D91519AE27D600C8CA5C /* Autolayout.js */,
+				77C0D91619AE27F200C8CA5C /* README */,
+				77C0D91719AE288200C8CA5C /* Flow (Example).txt */,
 			);
 			sourceTree = "<group>";
 		};

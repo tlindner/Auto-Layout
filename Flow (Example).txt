@@ -1,0 +1,34 @@
+One sided
+#
+# Flow documents always start with "One sided", or "Sheetwise".
+#
+# Flow lines: Top to bottom, left to right, bottom to top, right to left
+# can be set in any ordered desired, but must be matched pairs.
+# Flow lines contain two values:
+# 1. A count of columns or rows.
+# 2. An angle to rotate the page.
+#
+# The first flow line is the primary direction, and the second is the
+# secondary direction.
+#
+# Gutters must also be listed in pairs and contain a list of gutters
+# to be put between the pages. If the system runs out of gutters
+# during auto layout, it will start over at the begining of the list.
+#
+# The first gutter line is for the primary direction, and the second
+# gutter line is for the secondary direction.
+#
+# Pages lines contain five values.
+# 1. The name of the CSV file that contains a list of pages.
+# 2. The column name that contains the PDF file name.
+# 3. The column name that contains the page number in that PDF.
+# 4. The column name that contains the quantity desired of that page.
+# 5. The bleed distance in the PDF.
+#
+# Each page will be stepped and repeated.
+#
+Top to bottom:3,0
+Left to right:3,0
+Gutters:0.25,0.25
+Gutters:0.5,0.5
+Pages:Promo Cards AMB 8_14.r1.csv,file,Index,nup,0.125

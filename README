@@ -1,0 +1,11 @@
+Auto Layout is a script for InDeisgn.
+
+Using a flow file, and CSV files pages cane be steped and repeated on larger pages.
+
+It is written in javascript.
+
+It is copyright tim lindner, 2014.
+
+Autolayout.js is the main script.
+Autolayout_exec.js is a wrapper script that will turn off undo support and screen updates in Indesign.
+
