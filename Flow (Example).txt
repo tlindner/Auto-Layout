@@ -33,4 +33,4 @@ Top to bottom:3,0
 Left to right:3,0
 Gutters:0.125,0.25
 Gutters:0.25,0.5
-Pages:Promo Cards AMB 8_14.r1.csv,file,Index,nup,0.125
+Pages:file.csv,file,Index,nup,0.125
