@@ -36,9 +36,6 @@ auto_layout_file.open("r");
 
 var page_width = 0;
 var page_height = 0;
-
-//var layout = [ [1, 0, 90, 0, 2], [0, 1, 90, 0, 3], [ 1, 0, 90, 0, 3], [0, 1, 90, 0, 2] ];
-//var gutters = [ [ .0625, 0.125 ], [0.125, 0.625], [ .0625, 0.125 ], [0.125, 0.625] ];
 var layout = [];
 var gutters = [];
 var offset_y = 0;
@@ -116,13 +113,15 @@ while ( auto_layout_file.eof == false ) {
         var arguments = layout_line.split(",").map(Number);
         layout.push([0,1,arguments[1],0,arguments[0]]);
     }
-    if( layout_file_line_lc.startsWith("bottom to top:") ) {
-        alert( "Bottom to top is unimplemented");
-        exit();
+    else if( layout_file_line_lc.startsWith("bottom to top:") ) {
+        var layout_line = layout_file_line_lc.split(":")[1];
+        var arguments = layout_line.split(",").map(Number);
+        layout.push([-1,0,arguments[1],0,arguments[0]]);
     }
     else if( layout_file_line_lc.startsWith("right to left:") ) {
-        alert( "Right to left is unimplemented");
-        exit();
+        var layout_line = layout_file_line_lc.split(":")[1];
+        var arguments = layout_line.split(",").map(Number);
+        layout.push([0,-1,arguments[1],0,arguments[0]]);
     }
     else if( layout_file_line_lc.startsWith("gutters:") ) {
         var gutter_line = layout_file_line_lc.split(":")[1];
@@ -174,7 +173,29 @@ while ( auto_layout_file.eof == false ) {
         var csv_length = csv.length;
         for (var i = 1; i < csv_length; i++) {
             for (var j=0; j<csv[i][nup_index]; j++) {
-            
+                var anchorCorner;
+                
+                if( newPageFlag == true ) {
+                    myPage = myDocument.pages.add(LocationOptions.after, myPage);
+                    myPage.marginPreferences.properties = { top: 0, left: 0, right: 0, bottom:0 };
+                    gutter_index_primary = 0;
+                    gutter_index_secondary = 0;
+                    ul_index = 0;
+                    cur_x = 0;
+                    cur_y = 0;
+                    nxt_x = 0;
+                    nxt_y = 0;
+                    page_width = 0;
+                    page_height = 0;
+                    max_page_width = 0;
+                    max_page_height = 0;
+                    newPageFlag = false;
+                }
+
+                anchorCorner = ResetOrigin( myDocument, myPage, layout[ul_index][offset_y], layout[ul_index][offset_x], layout[ul_index+1][offset_y], layout[ul_index+1][offset_x]);
+
+                app.layoutWindows[0].zoom(ZoomOptions.FIT_PAGE);
+
                 // Make new rectangle and place PDF inside it.
                 var myRectangle = myPage.rectangles.add(recLayer, undefined, undefined, {strokeColor:"None",fillColor:"Paper",geometricBounds:[cur_y, cur_x, cur_y+1, cur_x+1]});
                 myRectangle.absoluteRotationAngle = layout[ul_index][angle];
@@ -185,18 +206,27 @@ while ( auto_layout_file.eof == false ) {
                 var pdf_height = mypdf.geometricBounds[2] - mypdf.geometricBounds[0] - (2 * bleed);
                 var pdf_width = mypdf.geometricBounds[3] - mypdf.geometricBounds[1] - (2 * bleed);
                 
-                // Calculate next boxes position
-                nxt_x = Math.max( nxt_x, cur_x + pdf_width + (layout[ul_index][offset_x] * gutters[ul_index+0][gutter_index_primary]) );
-                nxt_y = Math.max( nxt_y, cur_y + pdf_height + (layout[ul_index][offset_y] * gutters[ul_index+0][gutter_index_primary]) );
+                // Calculate box for rectangle
+                var y1 = cur_y;
+                var x1 = cur_x;
+                var y2 = cur_y + (layout[ul_index][offset_y] * pdf_height) + (layout[ul_index+1][offset_y] * pdf_height);
+                var x2 = cur_x + (layout[ul_index][offset_x] * pdf_width) + (layout[ul_index+1][offset_x] * pdf_width);
+                
+                // Calculate next box position
+                nxt_x = cur_x + (layout[ul_index][offset_x] * (pdf_width + gutters[ul_index+0][gutter_index_primary]));
+                nxt_y = cur_y + (layout[ul_index][offset_y] * (pdf_height + gutters[ul_index+0][gutter_index_primary]));
                 
                 // Set rectangle postition and size, and PDF position and size
-                myRectangle.geometricBounds = [cur_y, cur_x, cur_y+pdf_height, cur_x+pdf_width];
-                mypdf.geometricBounds = [cur_y - bleed, cur_x - bleed, cur_y + pdf_height + bleed, cur_x + pdf_width + bleed];
-                
+                myRectangle.geometricBounds = [Math.min(y1, y2), Math.min(x1,x2), Math.max(y1, y2), Math.max(x1,x2)];
+                mypdf.geometricBounds = [Math.min(y1, y2) - bleed, Math.min(x1,x2) - bleed, Math.max(y1, y2) + bleed, Math.max(x1,x2) + bleed];
+
+                page_height = Math.max(Math.abs(y1), Math.abs(y2));
+                page_width = Math.max(Math.abs(x1), Math.abs(x2));
+
                 // Draw crop marks on rectangle, send to back layer.
-                myDrawCropMarks (cur_x, cur_y, cur_x+pdf_width, cur_y+pdf_height, 0.25, 0.125, 0.25, myRegistrationColor, myNoneSwatch, myLayer);
+                myDrawCropMarks (Math.min(x1,x2), Math.min(y1, y2), Math.max(x1,x2), Math.max(y1, y2), 0.25, 0.125, 0.25, myRegistrationColor, myNoneSwatch, myLayer);
                 
-                // Expand rectangle to expose bleed.
+                // Expand clipping rectangle to expose bleed.
                 var previous_gutter_index_primary = gutter_index_primary - 1
                 if( previous_gutter_index_primary == -1 ) {
                     previous_gutter_index_primary = gutters[ul_index+0].length - 1;
@@ -207,12 +237,13 @@ while ( auto_layout_file.eof == false ) {
                     previous_gutter_index_secondary = gutters[ul_index+1].length - 1;
                 }
                 
+                // Adjust bleeds for small gutters
                 var left_bleed;
                 var right_bleed;
                 var top_bleed;
                 var bottom_bleed;
 
-                if( layout[ul_index][offset_y] == 1 && layout[ul_index+1][offset_y] == 0 ) {
+                if( layout[ul_index][offset_y] != 0 && layout[ul_index+1][offset_y] == 0 ) {
                     left_bleed = Math.min(bleed, gutters[ul_index+1][previous_gutter_index_secondary] / 2.0 );
                     right_bleed = Math.min(bleed, gutters[ul_index+1][gutter_index_secondary] / 2.0 );
                     top_bleed = Math.min(bleed, gutters[ul_index+0][previous_gutter_index_primary] / 2.0 );
@@ -258,34 +289,27 @@ while ( auto_layout_file.eof == false ) {
                     }
                 }
                 
-                myRectangle.geometricBounds = [cur_y-top_bleed, cur_x-left_bleed, cur_y+pdf_height+bottom_bleed, cur_x+pdf_width+right_bleed];
+                myRectangle.geometricBounds = [Math.min(y1, y2)-top_bleed, Math.min(x1,x2)-left_bleed, Math.max(y1, y2)+bottom_bleed, Math.max(x1,x2)+right_bleed];
+
+                cur_x = nxt_x;
+                cur_y = nxt_y;
                 
-                page_width = Math.max( page_width, nxt_x*72 );
-                page_height = Math.max( page_height, nxt_y*72 );
-                
-                cur_x = Math.max( cur_x, nxt_x * layout[ul_index][offset_x] );
-                cur_y = Math.max( cur_y, nxt_y * layout[ul_index][offset_y] );
-                
+                // Increment primary counter
                 layout[ul_index][counter] = layout[ul_index][counter] + 1;
                 
                 if( layout[ul_index][counter] == layout[ul_index][count] ) {
                     // Shift over (left or right) and back (top or bottom)
                     
-                    if( layout[ul_index][offset_y] == 1 && layout[ul_index+1][offset_y] == 0 ) {
+                    if( layout[ul_index][offset_y] != 0 && layout[ul_index+1][offset_y] == 0 ) {
                         cur_y = nxt_y = 0;
-                        cur_x = nxt_x + gutters[ul_index+1][gutter_index_secondary];
-
-                        page_width -= (layout[ul_index][offset_x] * gutters[ul_index+1][gutter_index_secondary]) * 72;
-                        page_height -= (layout[ul_index][offset_y] * gutters[ul_index+0][gutter_index_primary]) * 72;
+                        cur_x = layout[ul_index+1][offset_x] * (page_width + gutters[ul_index+1][gutter_index_secondary]);
                     }
-                    else if ( layout[ul_index][offset_y] == 0 && layout[ul_index+1][offset_y] == 1 ) {
-                        cur_y = nxt_y + gutters[ul_index+1][gutter_index_secondary];
+                    else if ( layout[ul_index][offset_y] == 0 && layout[ul_index+1][offset_y] != 0 ) {
+                        cur_y = layout[ul_index+1][offset_y] * (page_height + gutters[ul_index+1][gutter_index_secondary]);
                         cur_x = nxt_x = 0;
-
-                        page_width -= (layout[ul_index][offset_x] * gutters[ul_index+0][gutter_index_primary]) * 72;
-                        page_height -= (layout[ul_index][offset_y] * gutters[ul_index+1][gutter_index_secondary]) * 72;
                     }
                     
+                    // reset primary counter, increment secondary counter.
                     layout[ul_index][counter] = 0;
                     layout[ul_index+1][counter] = layout[ul_index+1][counter] + 1;
                     
@@ -293,7 +317,7 @@ while ( auto_layout_file.eof == false ) {
                     {
                         layout[ul_index+1][counter] = 0;
                         
-                        // Check if there is another layout on this page
+                        // Check if there is another flow
                         if( ul_index+2 < layout.length ) {
                             gutter_index_primary = -1;
                             gutter_index_secondary = -1;
@@ -311,9 +335,10 @@ while ( auto_layout_file.eof == false ) {
                     }
                 }
                 
+                // pages only get bigger
                 page_width = Math.max( page_width, max_page_width);
                 page_height = Math.max( page_height, max_page_height);
-                myPage.resize(CoordinateSpaces.INNER_COORDINATES, AnchorPoint.TOP_LEFT_ANCHOR, ResizeMethods.REPLACING_CURRENT_DIMENSIONS_WITH, [page_width, page_height]);
+                myPage.resize(CoordinateSpaces.INNER_COORDINATES, anchorCorner, ResizeMethods.REPLACING_CURRENT_DIMENSIONS_WITH, [page_width*72, page_height*72]);
                 max_page_width = page_width;
                 max_page_height = page_height;
                 
@@ -321,29 +346,50 @@ while ( auto_layout_file.eof == false ) {
                 if( !(gutter_index_primary < gutters[ul_index+0].length) ) {
                     gutter_index_primary = 0;
                 }
-                
-                if( newPageFlag == true ) {
-                    myPage = myDocument.pages.add(LocationOptions.after, myPage);
-                    myPage.marginPreferences.properties = { top: 0, left: 0, right: 0, bottom:0 };
-                    gutter_index_primary = 0;
-                    gutter_index_secondary = 0;
-                    ul_index = 0;
-                    cur_x = 0;
-                    cur_y = 0;
-                    nxt_x = 0;
-                    nxt_y = 0;
-                    page_width = 0;
-                    page_height = 0;
-                    max_page_width = 0;
-                    max_page_height = 0;
-                    newPageFlag = false;
-                }
             }
         }
     }
 }
 
-
+function ResetOrigin( doc, page, y1, x1, y2, x2) {
+    
+    if( y1 == 1 && x1 == 0 && y2== 0 && x2 == 1 ) {
+        doc.zeroPoint = [0, 0];
+        return AnchorPoint.TOP_LEFT_ANCHOR;
+    }
+    else if( y1 == 1 && x1 == 0 && y2 == 0 && x2 == -1 ) {
+        doc.zeroPoint = [Math.abs(page.bounds[3] - page.bounds[1]), 0];
+        return AnchorPoint.TOP_RIGHT_ANCHOR;
+    }
+    else if( y1 == 0 && x1 == 1 && y2 == 1 && x2 == 0 ) {
+        doc.zeroPoint = [0, 0];
+        return AnchorPoint.TOP_LEFT_ANCHOR;
+    }
+    else if( y1 == 0 && x1 == 1 && y2 == -1 && x2 == 0 ) {
+        doc.zeroPoint = [0, Math.abs(page.bounds[2] - page.bounds[0])];
+        return AnchorPoint.BOTTOM_LEFT_ANCHOR;
+    }
+    else if( y1 == -1 && x1 == 0 && y2 == 0 && x2 == 1 ) {
+        doc.zeroPoint = [0, Math.abs(page.bounds[2] - page.bounds[0])];
+        return AnchorPoint.BOTTOM_LEFT_ANCHOR;
+    }
+    else if( y1 == -1 && x1 == 0 && y2 == 0 && x2 == -1 ) {
+        doc.zeroPoint = [Math.abs(page.bounds[3] - page.bounds[1]), Math.abs(page.bounds[2] - page.bounds[0])];
+        return AnchorPoint.BOTTOM_RIGHT_ANCHOR;
+    }
+    else if( y1 == 0 && x1 == -1 && y2 == 1 && x2 == 0 ) {
+        doc.zeroPoint = [Math.abs(page.bounds[3] - page.bounds[1]), 0];
+        return AnchorPoint.TOP_RIGHT_ANCHOR;
+    }
+    else if( y1 == 0 && x1 == -1 && y2 == -1 && x2 == 0 ) {
+        doc.zeroPoint = [Math.abs(page.bounds[3] - page.bounds[1]), Math.abs(page.bounds[2] - page.bounds[0])];
+        return AnchorPoint.BOTTOM_RIGHT_ANCHOR;
+    }
+    else {
+        return undefined;
+    }
+    
+}
 
 function parseCSV(str) {
     var arr = [];
