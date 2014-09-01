@@ -66,6 +66,8 @@ with (myDocument.documentPreferences) {
     pageWidth = "4in";
     pageOrientation = PageOrientation.landscape;
     facingPages = false;
+    documentBleedUniformSize = true;
+    documentBleedTopOffset = 0.375;
 }
 
 var myRegistrationColor = myDocument.colors.item("Registration");
