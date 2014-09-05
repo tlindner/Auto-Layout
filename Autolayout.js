@@ -240,6 +240,9 @@ if((auto_layout_file == "")&&(auto_layout_file == null)) {
 
 auto_layout_file.open("r");
 
+var firstPage = 1;
+var secondPage = 1;
+
 var front_layout = [];
 var back_layout = [];
 var front_gutters = [];
@@ -390,12 +393,15 @@ while ( auto_layout_file.eof == false ) {
             alert( "Bleed distance was undefined in layout file."  );
             exit();
         }
-
-        var firstPage = new AutoLayout(myDocument, front_layout, front_gutters);
-        var secondPage;
+        
+        if( firstPage == 1) {
+            firstPage = new AutoLayout(myDocument, front_layout, front_gutters);
+        }
         
         if( sheetwise ) {
-            secondPage = new AutoLayout(myDocument, back_layout, back_gutters);
+            if( secondPage == 1 ) {
+                secondPage = new AutoLayout(myDocument, back_layout, back_gutters);
+            }
         }
         
         var csv_length = csv.length;
