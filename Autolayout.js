@@ -128,8 +128,16 @@ AutoLayout.prototype.LayoutPage = function(pdfFilePath, pageNumber) {
     var bottom_bleed;
     
     if( this.layout[this.ul_index][offset_y] != 0 && this.layout[this.ul_index+1][offset_y] == 0 ) {
-        left_bleed = Math.min(bleed, this.gutters[this.ul_index+1][previous_gutter_index_secondary] / 2.0 );
-        right_bleed = Math.min(bleed, this.gutters[this.ul_index+1][this.gutter_index_secondary] / 2.0 );
+
+        if( this.layout[this.ul_index+1][offset_y] == 0 && this.layout[this.ul_index+1][offset_x] == 1 ) {
+            left_bleed = Math.min(bleed, this.gutters[this.ul_index+1][previous_gutter_index_secondary] / 2.0 );
+            right_bleed = Math.min(bleed, this.gutters[this.ul_index+1][this.gutter_index_secondary] / 2.0 );
+        }
+        else {
+            right_bleed = Math.min(bleed, this.gutters[this.ul_index+1][previous_gutter_index_secondary] / 2.0 );
+            left_bleed = Math.min(bleed, this.gutters[this.ul_index+1][this.gutter_index_secondary] / 2.0 );
+        }
+        
         top_bleed = Math.min(bleed, this.gutters[this.ul_index+0][previous_gutter_index_primary] / 2.0 );
         bottom_bleed = Math.min(bleed, this.gutters[this.ul_index+0][this.gutter_index_primary] / 2.0 );
         
@@ -141,27 +149,55 @@ AutoLayout.prototype.LayoutPage = function(pdfFilePath, pageNumber) {
             bottom_bleed = bleed;
         }
         
-        if( this.layout[this.ul_index+1][counter] == 0 ) {
-            left_bleed = bleed;
+        if( this.layout[this.ul_index+1][offset_y] == 0 && this.layout[this.ul_index+1][offset_x] == 1 ) {
+            if( this.layout[this.ul_index+1][counter] == 0 ) {
+                left_bleed = bleed;
+            }
+            
+            if( this.layout[this.ul_index+1][counter]+1 == this.layout[this.ul_index+1][count] ) {
+                right_bleed = bleed;
+            }
         }
-        
-        if( this.layout[this.ul_index+1][counter]+1 == this.layout[this.ul_index+1][count] ) {
-            right_bleed = bleed;
+        else {
+            if( this.layout[this.ul_index+1][counter] == 0 ) {
+                right_bleed = bleed;
+            }
+            
+            if( this.layout[this.ul_index+1][counter]+1 == this.layout[this.ul_index+1][count] ) {
+                left_bleed = bleed;
+            }
         }
-        
     }
     else {
-        left_bleed = Math.min(bleed, this.gutters[this.ul_index+0][previous_gutter_index_primary] / 2.0 );
-        right_bleed = Math.min(bleed, this.gutters[this.ul_index+0][this.gutter_index_primary] / 2.0 );
+        if( this.layout[this.ul_index+1][offset_y] == 0 && this.layout[this.ul_index+1][offset_x] == 1 ) {
+            left_bleed = Math.min(bleed, this.gutters[this.ul_index+0][previous_gutter_index_primary] / 2.0 );
+            right_bleed = Math.min(bleed, this.gutters[this.ul_index+0][this.gutter_index_primary] / 2.0 );
+        }
+        else {
+            right_bleed = Math.min(bleed, this.gutters[this.ul_index+0][previous_gutter_index_primary] / 2.0 );
+            left_bleed = Math.min(bleed, this.gutters[this.ul_index+0][this.gutter_index_primary] / 2.0 );
+        }
+        
         top_bleed = Math.min(bleed, this.gutters[this.ul_index+1][previous_gutter_index_secondary] / 2.0 );
         bottom_bleed = Math.min(bleed, this.gutters[this.ul_index+1][this.gutter_index_secondary] / 2.0 );
         
-        if( this.layout[this.ul_index][counter] == 0 ) {
-            left_bleed = bleed;
+        if( this.layout[this.ul_index+1][offset_y] == 0 && this.layout[this.ul_index+1][offset_x] == 1 ) {
+            if( this.layout[this.ul_index+1][counter] == 0 ) {
+                left_bleed = bleed;
+            }
+            
+            if( this.layout[this.ul_index+1][counter]+1 == this.layout[this.ul_index+1][count] ) {
+                right_bleed = bleed;
+            }
         }
-        
-        if( this.layout[this.ul_index][counter]+1 == this.layout[this.ul_index][count] ) {
-            right_bleed = bleed;
+        else {
+            if( this.layout[this.ul_index+1][counter] == 0 ) {
+                right_bleed = bleed;
+            }
+            
+            if( this.layout[this.ul_index+1][counter]+1 == this.layout[this.ul_index+1][count] ) {
+                left_bleed = bleed;
+            }
         }
         
         if( this.layout[this.ul_index+1][counter] == 0 ) {
@@ -403,7 +439,7 @@ while ( auto_layout_file.eof == false ) {
                 secondPage = new AutoLayout(myDocument, back_layout, back_gutters);
             }
         }
-        
+
         var csv_length = csv.length;
         for (var i = 1; i < csv_length; i++) {
             for (var j=0; j<csv[i][nup_index]; j++) {
